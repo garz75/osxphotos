@@ -3666,6 +3666,35 @@ def places(ctx, cli_obj, db, json_, photos_library):
 @cli.command()
 @DB_OPTION
 @JSON_OPTION
+@DB_ARGUMENT
+@click.pass_obj
+@click.pass_context
+def folders(ctx, cli_obj, db, json_, photos_library):
+    """ Print out top-level folders names found in the Photos library. """
+
+    # below needed for to make CliRunner work for testing
+    cli_db = cli_obj.db if cli_obj is not None else None
+    db = get_photos_db(*photos_library, db, cli_db)
+    if db is None:
+        click.echo(cli.commands["folders"].get_help(ctx), err=True)
+        click.echo("\n\nLocated the following Photos library databases: ", err=True)
+        _list_libraries()
+        return
+
+    photosdb = osxphotos.PhotosDB(dbfile=db)
+    titles = sorted(list(map(lambda f: f.title, photosdb.folder_info)))
+
+    # below needed for to make CliRunner work for testing
+    cli_json = cli_obj.json if cli_obj is not None else None
+    if json_ or cli_json:
+        click.echo(json.dumps(titles, ensure_ascii=False))
+    else:
+        click.echo(yaml.dump(titles, sort_keys=False, allow_unicode=True))
+
+
+@cli.command()
+@DB_OPTION
+@JSON_OPTION
 @deleted_options
 @DB_ARGUMENT
 @click.pass_obj

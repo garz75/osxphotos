@@ -544,6 +544,8 @@ shared albums: {}
 
 PERSONS_JSON = {"persons": {"Katie": 3, "Suzy": 2, "_UNKNOWN_": 1, "Maria": 2}}
 
+FOLDERS_JSON = ["Folder1", "Folder2", "Pumpkin Farm"]
+
 UUID_EXPECTED_FROM_FILE = [
     "E9BC5C36-7CD1-40A1-A72B-8B8FAC227D51",
     "6191423D-8DB8-4D4C-92BE-9BBBA308AAC4",
@@ -4803,6 +4805,25 @@ def test_persons():
 
     json_got = json.loads(result.output)
     assert json_got == PERSONS_JSON
+
+
+def test_folders():
+    """Test osxphotos folders """
+    import json
+    import osxphotos
+    import os
+    import os.path
+    from osxphotos.cli import folders
+
+    runner = CliRunner()
+    cwd = os.getcwd()
+    result = runner.invoke(
+        folders, ["--db", os.path.join(cwd, PHOTOS_DB_15_5), "--json"]
+    )
+    assert result.exit_code == 0
+
+    json_got = json.loads(result.output)
+    assert json_got == FOLDERS_JSON
 
 
 def test_export_report():
